@@ -210,8 +210,75 @@ function shellSort(arr){
 }
 
 // 归并排序-将数组向下分解为子数组，子数组元素个数为1，再将相邻的两个子数组组合成有序数组，向上递归
-function mergeSort(arr) {
 
+// 合并有序数组
+function mergeArrayByIndex(arr, start1, end1, start2, end2) {
+  let  indexA = start1, indexB = start2, indexMerged = 0, mergedArray  = []
+  while(indexA <= end1 && indexB <= end2) {
+    mergedArray[indexMerged++] = arr[indexA] < arr[indexB] ? arr[indexA++] : arr[indexB++]
+  }
+  while (indexA <= end1) { mergedArray[indexMerged++] = arr[indexA++] }
+  while (indexB <= end2) { mergedArray[indexMerged++] = arr[indexB++] 
+  }
+  return mergedArray
 }
-shellSort(demoArray)
+function mergeSort(arr) {
+  function sort(arr, start, end) {
+    if(start !== end) {
+      let middle = start + ((end - start) >> 1)
+      sort(arr, start, middle)
+      sort(arr, middle + 1, end)
+      let temp = mergeArrayByIndex(arr, start, middle, middle + 1, end)
+      for(let i = 0; i < temp.length; i++) {
+        arr[start + i] = temp[i]
+      }
+    }
+  }
+  sort(arr, 0, arr.length - 1)
+  return arr
+}
+
+// 快速排序-
+function partitionOne(arr, left, right) {
+  let pivot = arr[right]
+  pivotIndex = right
+  while(left < right) {
+    while(left < right && arr[left] <= pivot) {
+      left++
+    }
+    while(left < right && arr[right] >= pivot) {
+      right--
+    }
+    swap(arr, left, right)
+  }
+  swap(arr, left, pivotIndex)
+  return left
+}
+function partitionTwo(arr, left, right) {
+  let pivot = arr[right]
+  while(left < right) {
+    while(left < right && arr[left] <= pivot) {
+      left++
+    }
+    arr[right] = arr[left]
+    while(left < right && arr[right] >= pivot) {
+      right--
+    }
+    arr[left] = arr[right]
+  }
+  arr[right] = pivot
+  return left
+}
+function quickSort(arr) {
+  function sort(arr, left, right) {
+    if(left < right) {
+      let index = partition(arr, left, right)
+      sort(arr, left, index - 1)
+      sort(arr, index + 1, right)
+    }
+  }
+  sort(arr, 0, arr.length - 1)
+  return arr
+}
+quickSort(demoArray)
 console.log(demoArray)
