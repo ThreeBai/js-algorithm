@@ -238,7 +238,11 @@ function mergeSort(arr) {
   return arr
 }
 
-// 快速排序-
+// 快速排序- 取枢轴pivot， 每次将数组切割成两部分，左侧都小于pivot，右侧都大于pivot，递归分割直到数组长度为1，原数组即有序。
+// 算法设计：1. 核心在于划分子区间，即分割排序方法partition的实现
+// 2. 优化点：枢轴pivot的选择非常重要，通常可使用三数取中法（取左、右、中三个数中的中间数);小数组和部分有序使用插入法要比快速排序更好
+
+// 使用左右指针法实现partition
 function partitionOne(arr, left, right) {
   let pivot = arr[right]
   pivotIndex = right
@@ -254,6 +258,7 @@ function partitionOne(arr, left, right) {
   swap(arr, left, pivotIndex)
   return left
 }
+// 使用挖坑法实现partition
 function partitionTwo(arr, left, right) {
   let pivot = arr[right]
   while(left < right) {
@@ -269,10 +274,21 @@ function partitionTwo(arr, left, right) {
   arr[right] = pivot
   return left
 }
+// 使用前后指针法实现partition，支持对链表进行排序
+function partitionThree(arr, left, right) {
+  let cur = left, pre = cur - 1, pivot = arr[right]
+  while(cur <= right) {
+    if(arr[cur] <= pivot && ++pre !== cur)
+      swap(arr, cur, pre)
+    cur++
+  } 
+  return pre
+}
+// 使用递归实现的快速排序
 function quickSort(arr) {
   function sort(arr, left, right) {
     if(left < right) {
-      let index = partition(arr, left, right)
+      let index = partitionThree(arr, left, right)
       sort(arr, left, index - 1)
       sort(arr, index + 1, right)
     }
@@ -280,5 +296,97 @@ function quickSort(arr) {
   sort(arr, 0, arr.length - 1)
   return arr
 }
-quickSort(demoArray)
+// 使用栈（用来保存区间）实现的快速排序，递归本身就一个压栈的过程
+function quickSortUseStack(arr, start, end){
+  let stack = []
+  stack.push(end)
+  stack.push(start)
+  while(stack.length) {
+    let l = stack.pop()
+    let r = stack.pop()
+    let index = partitionThree(arr, l, r)
+    if(l < index - 1){
+      stack.push(index - 1)
+      stack.push(l)
+    }
+    if(r > index + 1) {
+      stack.push(right)
+      stack.push(index + 1)
+    }
+  }
+}
+
+
+// 计数排序-
+function countSort(arr) {
+  let max = arr[0], min = arr[0], len = arr.length
+  for(let i = 0; i < len; i++) {
+    if(arr[i] > max) { max = arr[i] }
+    if(arr[i] < min) { min = arr[i] }
+  }
+  let size = max - min + 1
+  let buckets = new Array(size).fill(0)
+  for(let i = 0; i < len; i++) {
+    buckets[arr[i] - min]++
+  }
+  for(let i = 1; i < size; i++) {
+    buckets[i] += buckets[i - 1]
+  }
+  let ret = []
+  for (let i = len - 1; i >= 0; i--) {
+    buckets[arr[i] - min]--
+    console.log(buckets[arr[i] - min],'buckets[arr[i] - min]')
+    ret[buckets[arr[i] -min]] = arr[i]
+  }
+  return ret
+}
+
+
+// 桶排序-是一种特殊的分治法,参数num需要小于原数组长度
+function bucketSort(arr, num) {
+  if(arr.length <= 1){ return arr }
+  let n = arr.length, min = Math.min.apply(0, arr), max = Math.max.apply(0, arr)
+  if(min === max) { return arr }
+  let compacity = (max - min +1) / num
+  let buckets = new Array(max - min + 1)
+  for (let i = 0; i < n; i++) {
+    let el = arr[i]
+    let index = Math.floor((el - min) / compacity)
+    let bucket = buckets[index]
+    if(bucket) {
+      let jn = bucket.length
+      if(el >= bucket[jn - 1]) {
+        bucket[jn] = el
+      }else {
+        for (let j = 0; j < jn; j++) {
+          if(bucket[j] > el) {
+            while(jn > j) {
+              bucket[jn] = bucket[jn - 1]
+              jn--
+            }
+            bucket[j] = el
+            break
+          }
+        }
+      }
+    }else {
+      buckets[index] = [el]
+    }
+  }
+  let index = 0
+  for (let i = 0; i < num; i++) {
+    let bucket = buckets[i]
+    for (let k = 0, kn = bucket.length; k < kn; k++) {
+      arr[index++] = bucket[k]
+    }
+  }
+  return arr
+}
+
+// 基数排序-非比较型整数排序算法，按整数的每个位数上的值进行分组，分为LSD（从低位到高位）和MSD（从高位到低位）两种
+function radixLsdSort(arr) {
+  let max  = Math.max.apply(null, arr)
+  console.log(max,'max')
+}
+radixLsdSort(demoArray)
 console.log(demoArray)
