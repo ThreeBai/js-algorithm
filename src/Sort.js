@@ -335,7 +335,6 @@ function countSort(arr) {
   let ret = []
   for (let i = len - 1; i >= 0; i--) {
     buckets[arr[i] - min]--
-    console.log(buckets[arr[i] - min],'buckets[arr[i] - min]')
     ret[buckets[arr[i] -min]] = arr[i]
   }
   return ret
@@ -384,9 +383,77 @@ function bucketSort(arr, num) {
 }
 
 // 基数排序-非比较型整数排序算法，按整数的每个位数上的值进行分组，分为LSD（从低位到高位）和MSD（从高位到低位）两种
+// 获取数字位数
+function getLoopTimes(num) {
+  let digit = 0
+  do {
+    if(num > 1) { digit++ }else { break}
+  }while ((num = num / 10))
+  return digit
+}
+// 获取数字某个位数的值
+function getNumber(num, i) {
+  // return Math.floor((num / Math.pow(10, i- 1)) % 10)
+  return num.toString().reverse()[i]
+}
+// lsd划分
+function lsdRadix(arr, buckets, len, radix) {
+  for( let i = 0; i < len; i++) {
+    let el = arr[i]
+    let index  = getNumber(el, radix)
+    buckets[index].push(el)
+  }
+  let k = 0
+  for (let i = 0; i < 10; i++) {
+    let bucket = buckets[i]
+    for(let j = 0; j < bucket.length; j++) {
+      arr[k++] = bucket[j]
+    }
+    bucket.length = 0
+  }
+}
 function radixLsdSort(arr) {
   let max  = Math.max.apply(null, arr)
-  console.log(max,'max')
+  let times = getLoopTimes(max), len = arr.length,  buckets = [[],[],[],[],[],[],[],[],[],[]]
+  for (let radix = 1; radix <= times; radix++) { 
+    lsdRadix(arr, buckets, len, radix)
+  }
 }
-radixLsdSort(demoArray)
+
+// msd划分
+function msdRadix(arr,len, radix) {
+  let buckets = [[],[],[],[],[],[],[],[],[],[]]
+  for( let i = 0; i < len; i++) {
+    let el = arr[i]
+    let index  = getNumber(el, radix)
+    buckets[index].push(el)
+  }
+  // 递归子桶
+  for( let i = 0; i <10; i++) {
+    let el = buckets[i]
+    if(el.length > 1 && radix - 1) {
+      msdRadix(el, el.length, radix -1)
+    }
+  }
+  // 重写桶
+  let k = 0
+  for (let i = 0; i < 10; i++) {
+    let bucket = buckets[i]
+    for(let j = 0; j < bucket.length; j++) {
+      arr[k++] = bucket[j]
+    }
+    bucket.length = 0
+  }
+}
+function radixMsdSort(arr) {
+  let max = Math.max.apply(null, arr), times = getLoopTimes(max), len = arr.length
+  msdRadix(arr, len, times )
+}
+radixMsdSort(demoArray)
 console.log(demoArray)
+
+// 排序使用场景
+// 大数组： 快速、归并  
+// 中数组： 希尔
+// 小数组： 冒泡、选择、希尔
+// 无序性高： 快速、希尔  无序性低： 插入、冒泡

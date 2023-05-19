@@ -5,7 +5,7 @@
 ### page 18 (insertSort2代码块)
 
     说明: 变量j的初始值错误
-    正确代码如下:
+    修正:
   ``` javascript
   function insertSort2(array) {
       let n = array.length
@@ -32,3 +32,12 @@
 ### page 31 (挖坑法步骤一)
   说明： “这里选择第1个元素”错误
   修正： 应为“选择最后1个元素”
+
+### page42 (getBucketNumber方法)
+  说明： 代码逻辑错误
+  修正： 
+  ```javascript
+  function getBucketNumber(num, i) {
+    return Math.floor((num / Math.pow(10, i - 1)) % 10)
+  }
+  ```
