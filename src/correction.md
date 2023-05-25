@@ -41,3 +41,38 @@
     return Math.floor((num / Math.pow(10, i - 1)) % 10)
   }
   ```
+## 第3章  链表
+### page56 (双向链表的插入insertAt方法)
+  说明： 缺少在非空链表头部插入的逻辑
+  修正： 
+  ```javascript
+  insertAt(index, value) {
+    if(index <= this.length) {
+      let node  =  new Node(value)
+      if(index === 0) {
+        if(this.head) {
+          let next = this.head
+          this.head = node
+          node.next = next
+        }else {
+          this.tail = this.head = node
+        }
+      }else {
+        let prev = this.findIndex(index - 1)
+        let next = prev.next
+        prev.next = node
+        node.prev = prev
+        node.next = next
+        if(next) {
+          next.prev = node
+        }else {
+          // 如果是在最后插入，插入完成后还需将node设置为tail
+          this.tail = node
+        }
+      }
+      this.length++
+    }else {
+      throw `${index}超出链表长度${this.length}`
+    }
+  }
+  ```
